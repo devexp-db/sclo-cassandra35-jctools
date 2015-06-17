@@ -3,7 +3,7 @@
 
 Name:          jctools
 Version:       1.1
-Release:       0.1.alpha%{?dist}
+Release:       0.2.alpha%{?dist}
 Summary:       Java Concurrency Tools for the JVM
 License:       ASL 2.0
 URL:           http://jctools.github.io/JCTools/
@@ -76,5 +76,8 @@ find . -name '*.jar' -print -delete
 %license LICENSE
 
 %changelog
+* Wed Jun 17 2015 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 1.1-0.2.alpha
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_23_Mass_Rebuild
+
 * Tue May 19 2015 gil cattaneo <puntogil@libero.it> 1.1-0.1.alpha
 - initial rpm
