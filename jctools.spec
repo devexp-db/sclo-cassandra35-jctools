@@ -3,7 +3,7 @@
 
 Name:          jctools
 Version:       1.2.1
-Release:       1%{?dist}
+Release:       2%{?dist}
 Summary:       Java Concurrency Tools for the JVM
 License:       ASL 2.0
 URL:           http://jctools.github.io/JCTools/
@@ -109,6 +109,9 @@ done
 %license LICENSE
 
 %changelog
+* Fri Feb 10 2017 Fedora Release Engineering <releng@fedoraproject.org> - 1.2.1-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_26_Mass_Rebuild
+
 * Wed Sep 28 2016 gil cattaneo <puntogil@libero.it> 1.2.1-1
 - update to 1.2.1
 
