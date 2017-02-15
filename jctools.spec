@@ -1,21 +1,27 @@
+%{?scl:%scl_package jctools}
+%{!?scl:%global pkg_name %{name}}
+
 %global namedreltag %nil
 %global namedversion %{version}%{?namedreltag}
 
-Name:          jctools
-Version:       1.2.1
-Release:       2%{?dist}
-Summary:       Java Concurrency Tools for the JVM
-License:       ASL 2.0
-URL:           http://jctools.github.io/JCTools/
-Source0:       https://github.com/JCTools/JCTools/archive/v%{namedversion}/%{name}-%{namedversion}.tar.gz
+Name:		%{?scl_prefix}jctools
+Version:	1.2.1
+Release:	3%{?dist}
+Summary:	Java Concurrency Tools for the JVM
+License:	ASL 2.0
+URL:		http://jctools.github.io/JCTools/
+Source0:	https://github.com/JCTools/JCTools/archive/v%{namedversion}/%{pkg_name}-%{namedversion}.tar.gz
 
-BuildRequires: maven-local
-BuildRequires: mvn(junit:junit)
-BuildRequires: mvn(org.apache.felix:maven-bundle-plugin)
-BuildRequires: mvn(org.hamcrest:hamcrest-all)
-BuildRequires: mvn(org.ow2.asm:asm-all)
-
-BuildArch:     noarch
+# nasty hack TODO
+BuildRequires:	java-devel-openjdk >= 1:1.8.0
+Requires:	java-devel-openjdk >= 1:1.8.0
+BuildRequires:	%{?scl_prefix_maven}maven-local
+BuildRequires:	%{?scl_prefix_maven}maven-plugin-bundle
+BuildRequires:	%{?scl_prefix_java_common}junit
+BuildRequires:	%{?scl_prefix_java_common}hamcrest
+BuildRequires:  %{?scl_prefix_java_common}objectweb-asm%{?scl:5}
+%{?scl:Requires: %scl_runtime}
+BuildArch:	noarch
 
 %description
 This project aims to offer some concurrent data structures
@@ -30,20 +36,20 @@ currently missing from the JDK:
 ° Executor
 
 %package experimental
-Summary:       JCTools Experimental implementations
+Summary:	JCTools Experimental implementations
 
 %description experimental
 Experimental implementations for the
 Java Concurrency Tools Library.
 
 %package javadoc
-Summary:       Javadoc for %{name}
+Summary:	Javadoc for %{name}
 
 %description javadoc
 This package contains javadoc for %{name}.
 
 %package parent
-Summary:       JCTools Parent POM
+Summary:	JCTools Parent POM
 
 %description parent
 JCTools Parent POM.
@@ -54,26 +60,30 @@ JCTools Parent POM.
 find . -name '*.class' -print -delete
 find . -name '*.jar' -print -delete
 
+%{?scl:scl enable %{scl_maven} %{scl} - << "EOF"}
 %pom_xpath_set pom:project/pom:version %{namedversion}
-%pom_xpath_set -r pom:parent/pom:version %{namedversion} %{name}-core %{name}-experimental
+%pom_xpath_set -r pom:parent/pom:version %{namedversion} %{pkg_name}-core %{pkg_name}-experimental
 
 # Prevent build failure
 %pom_remove_plugin :maven-enforcer-plugin
 
 # Unavailable deps
-%pom_disable_module %{name}-benchmarks
+%pom_disable_module %{pkg_name}-benchmarks
 
 # Not available
-%pom_remove_plugin :cobertura-maven-plugin %{name}-core
+%pom_remove_plugin :cobertura-maven-plugin %{pkg_name}-core
 
 # Useless tasks
-%pom_remove_plugin :maven-source-plugin %{name}-core
-%pom_xpath_remove "pom:plugin[pom:artifactId = 'maven-javadoc-plugin']/pom:executions" %{name}-core
+%pom_remove_plugin :maven-source-plugin %{pkg_name}-core
+%pom_xpath_remove "pom:plugin[pom:artifactId = 'maven-javadoc-plugin']/pom:executions" %{pkg_name}-core
+
+# lower the version requirement for objectweb-asm in scl package
+%{?scl:%pom_change_dep :asm-all:5.0.4 :asm-all:5.0.3 %{pkg_name}-experimental}
 
 # Add OSGi support
 for mod in core experimental; do
- %pom_xpath_set "pom:project/pom:packaging" bundle %{name}-${mod}
- %pom_add_plugin org.apache.felix:maven-bundle-plugin:2.3.7 %{name}-${mod} '
+ %pom_xpath_set "pom:project/pom:packaging" bundle %{pkg_name}-${mod}
+ %pom_add_plugin org.apache.felix:maven-bundle-plugin:2.3.7 %{pkg_name}-${mod} '
  <extensions>true</extensions>
  <executions>
    <execution>
@@ -88,27 +98,34 @@ for mod in core experimental; do
   <excludeDependencies>true</excludeDependencies>
  </configuration>'
 done
+%{?scl:EOF}
 
 %build
-
+%{?scl:scl enable %{scl_maven} %{scl} - << "EOF"}
 %mvn_build -s
+%{?scl:EOF}
 
 %install
+%{?scl:scl enable %{scl_maven} %{scl} - << "EOF"}
 %mvn_install
+%{?scl:EOF}
 
-%files -f .mfiles-%{name}-core
+%files -f .mfiles-%{pkg_name}-core
 %doc README.md
 %license LICENSE
 
-%files experimental -f .mfiles-%{name}-experimental
+%files experimental -f .mfiles-%{pkg_name}-experimental
 
 %files javadoc -f .mfiles-javadoc
 %license LICENSE
 
-%files parent -f .mfiles-%{name}-parent
+%files parent -f .mfiles-%{pkg_name}-parent
 %license LICENSE
 
 %changelog
+* Wed Feb 15 2017 Tomas Repik <trepik@redhat.com> - 1.2.1-3
+- scl conversion
+
 * Fri Feb 10 2017 Fedora Release Engineering <releng@fedoraproject.org> - 1.2.1-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_26_Mass_Rebuild
 
