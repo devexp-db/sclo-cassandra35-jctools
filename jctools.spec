@@ -5,8 +5,8 @@
 %global namedversion %{version}%{?namedreltag}
 
 Name:		%{?scl_prefix}jctools
-Version:	1.2.1
-Release:	3%{?dist}
+Version:	2.0.2
+Release:	1%{?dist}
 Summary:	Java Concurrency Tools for the JVM
 License:	ASL 2.0
 URL:		http://jctools.github.io/JCTools/
@@ -69,6 +69,10 @@ find . -name '*.jar' -print -delete
 
 # Unavailable deps
 %pom_disable_module %{pkg_name}-benchmarks
+%pom_disable_module %{pkg_name}-concurrency-test
+
+# This dep is unused and unneeded
+%pom_remove_dep "com.google.guava:guava-testlib" jctools-experimental
 
 # Not available
 %pom_remove_plugin :cobertura-maven-plugin %{pkg_name}-core
@@ -78,7 +82,7 @@ find . -name '*.jar' -print -delete
 %pom_xpath_remove "pom:plugin[pom:artifactId = 'maven-javadoc-plugin']/pom:executions" %{pkg_name}-core
 
 # lower the version requirement for objectweb-asm in scl package
-%{?scl:%pom_change_dep :asm-all:5.0.4 :asm-all:5.0.3 %{pkg_name}-experimental}
+%{?scl:%pom_change_dep :asm-all:5.1 :asm-all:5.0.3 %{pkg_name}-experimental}
 
 # Add OSGi support
 for mod in core experimental; do
@@ -123,6 +127,9 @@ done
 %license LICENSE
 
 %changelog
+* Mon Aug 14 2017 Tomas Repik <trepik@redhat.com> - 2.0.2-1
+- Update to 2.0.2
+
 * Wed Feb 15 2017 Tomas Repik <trepik@redhat.com> - 1.2.1-3
 - scl conversion
 
